@@ -1,0 +1,12 @@
+syntax="proto2";
+
+package protobuf;
+
+option java_package = "com.xiwan.NettyGamer.proto";
+option java_outer_classname = "ServerRequest";
+
+message msgInfo  {
+  required int32 Type = 1;
+  repeated string VarTable = 2;
+  repeated bytes ObjectTable = 3;
+}

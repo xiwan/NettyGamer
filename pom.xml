@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.xiwan</groupId>
+  <artifactId>NettyGamer</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>NettyGamer</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+  	
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>2.6.1</version>
+    </dependency>
+        
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-all</artifactId>
+		    <version>4.1.32.Final</version>
+		</dependency>
+		
+    <!-- <dependency>
+        <groupId>com.typesafe.akka</groupId>
+        <artifactId>akka-actor_2.11</artifactId>
+        <version>2.4.9</version>
+    </dependency>	
+         -->
+  </dependencies>
+  
+    <repositories>
+        <repository>
+            <id>typesafe</id>
+            <name>Typesafe Repository</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+        </repository>
+    </repositories>
+     
+  <build>
+      <extensions>
+         <extension>
+             <groupId>kr.motd.maven</groupId>
+             <artifactId>os-maven-plugin</artifactId>
+             <version>1.4.1.Final</version>
+         </extension>
+      </extensions>
+      <plugins>
+      
+          <plugin>
+             <groupId>org.xolstice.maven.plugins</groupId>
+             <artifactId>protobuf-maven-plugin</artifactId>
+             <version>0.5.0</version>
+             <configuration>
+             	<protocExecutable>F:\protoc-2.6.1-win32\protoc.exe</protocExecutable>
+               <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
+               <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+               <clearOutputDirectory>false</clearOutputDirectory>
+               <temporaryProtoFileDirectory>${project.build.directory}/protoc-dependencies</temporaryProtoFileDirectory>
+             </configuration>
+             <executions>
+             		<execution>
+                     <goals>
+                         <goal>compile</goal>
+                     </goals>
+                 </execution>
+             </executions>
+          </plugin>
+
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>2.3.2</version>
+               <configuration>
+                   <source>1.8</source>
+                   <target>1.8</target>
+               </configuration>
+           </plugin>
+            
+      </plugins>
+	</build>
+  
+</project>
