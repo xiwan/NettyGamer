@@ -1,8 +1,11 @@
 package com.xiwan.NettyGamer;
 
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.xiwan.NettyGamer.Enum.ServerCmd;
 import com.xiwan.NettyGamer.base.GameServer;
@@ -45,17 +48,28 @@ public class App {
     GameServer.Instance().Initialize("");
     GameServer.Instance().StartServer();
     GameServer.Instance().StartTimer();
+    
+    System.out.println("done");
   }
 
   private static void ShutdownServer() {
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-    singleThreadExecutor.execute(new Runnable() {
+    Future<Boolean> task = singleThreadExecutor.submit(new Callable<Boolean>() {
       @Override
-      public void run() {
+      public Boolean call() throws Exception {
         GameServer.Instance().ShutdownServer();
-        System.exit(0);
+        return true;
       }
     });
+    try {
+      boolean result = task.get() || task.isDone();
+      System.out.println(String.format("exit: %s", result));
+    } catch (InterruptedException | ExecutionException e) {
+      task.cancel(true);
+    } finally {
+      singleThreadExecutor.shutdown();
+      System.exit(0);
+    }
   }
 
 }

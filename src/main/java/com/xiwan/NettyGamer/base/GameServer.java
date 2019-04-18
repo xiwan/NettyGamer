@@ -23,13 +23,11 @@ public class GameServer extends ServerBase {
   @Override
   public void StartServer() {
     Start();
-    System.out.println("done");
   }
 
   @Override
   public void ShutdownServer() {
     Shutdown();
-    System.out.println("exit");
   }
 
   @Override

@@ -30,11 +30,10 @@ public abstract class ServerBase {
   public abstract void StartTimer();
 
   public abstract void LocalizeRequestRouteTable();
-  
+
   public abstract boolean ActorAction(RequestData rd, ActorMode actorMode);
 
   protected void Start() {
-
     try {
       framedServer = new FramedServer(this.port, this.maxPackageSize, (rd) -> ReceiveData(rd),
           (ctx) -> Disconnect(ctx));
@@ -50,7 +49,6 @@ public abstract class ServerBase {
     try {
       if (framedServer != null)
         framedServer.stop();
-      
       ActorCache.fixedThreadExecutor.shutdown();
     } catch (Exception e) {
       // TODO Auto-generated catch block
@@ -64,7 +62,7 @@ public abstract class ServerBase {
       int priority = requestRoute.getPriority();
       Consumer<RequestData> action = requestRoute.getAction();
       ActorMode actorMode = requestRoute.getActorMode();
-      
+
       this.ActorAction(rd, actorMode);
     }
   }
