@@ -15,6 +15,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
 
 public class FramedServer {
 
@@ -23,13 +24,19 @@ public class FramedServer {
   private EventLoopGroup workerGroup;
   private int port;
   private int maxPackageSize;
+  private int maxReaderIdleTime = 0;
+  private int maxWriterIdleTime = 0;
+  private int maxAllIdleTime = 0;
   private Consumer<RequestData> receiveAction;
   private Consumer<ChannelHandlerContext> disconnectAction;
 
-  public FramedServer(int port, int maxPackageSize, Consumer<RequestData> receiveAction,
+  public FramedServer(int port, int maxPackageSize, int maxReaderIdleTime, int maxWriterIdleTime, int maxAllIdleTime, Consumer<RequestData> receiveAction,
       Consumer<ChannelHandlerContext> disconnectAction) {
     this.port = port;
     this.maxPackageSize = maxPackageSize;
+    this.maxReaderIdleTime = maxReaderIdleTime;
+    this.maxWriterIdleTime = maxWriterIdleTime;
+    this.maxAllIdleTime = maxAllIdleTime;
     this.receiveAction = receiveAction;
     this.disconnectAction = disconnectAction;
   }
@@ -49,6 +56,7 @@ public class FramedServer {
               // TODO Auto-generated method stub
               ch.pipeline().addLast(new LengthFieldPrepender(4));
               ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(maxPackageSize, 0, 4, -4, 0));
+              ch.pipeline().addLast(new IdleStateHandler(maxReaderIdleTime, maxWriterIdleTime, maxAllIdleTime));
               ch.pipeline().addLast(new FramedServerHandler(receiveAction, disconnectAction));
             }
 

@@ -14,6 +14,9 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 
 public class FramedServerHandler extends ChannelInboundHandlerAdapter {
+
+  private final int HEADER_LENGTH = 4;
+  private final int TICKET_LENGTH = 4;
   private ByteBuf buf;
   private Consumer<RequestData> receiveAction;
   private Consumer<ChannelHandlerContext> disconnectAction;
@@ -29,10 +32,10 @@ public class FramedServerHandler extends ChannelInboundHandlerAdapter {
       ByteBuf in = (ByteBuf) msg;
       buf = ctx.alloc().buffer(in.readableBytes());
       buf.writeBytes(in);
-      if (buf.readableBytes() >= 8) {
-        System.out.println(ByteBufUtil.hexDump(buf));
-        int length = buf.readInt();
-        int ticket = buf.readInt();
+      if (buf.readableBytes() >= HEADER_LENGTH + TICKET_LENGTH) {
+        //System.out.println(ByteBufUtil.hexDump(buf));
+        int length = buf.readInt(); // HEADER_LENGTH
+        int ticket = buf.readInt(); // TICKET_LENGTH
         byte[] b = new byte[buf.readableBytes()];
         buf.readBytes(b);
         ServerRequest.msgInfo rawData = ServerRequest.msgInfo.parseFrom(b);
@@ -84,6 +87,7 @@ public class FramedServerHandler extends ChannelInboundHandlerAdapter {
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
     // TODO Auto-generated method stub
     super.exceptionCaught(ctx, cause);
+    ctx.close();
   }
 
 }

@@ -66,7 +66,7 @@
              <artifactId>protobuf-maven-plugin</artifactId>
              <version>0.5.0</version>
              <configuration>
-             	<protocExecutable>F:\protoc-2.6.1-win32\protoc.exe</protocExecutable>
+             	 <protocExecutable>F:\protoc-2.6.1-win32\protoc.exe</protocExecutable>
                <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
                <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
                <clearOutputDirectory>false</clearOutputDirectory>
@@ -81,7 +81,7 @@
              </executions>
           </plugin>
 
-           <plugin>
+          <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-compiler-plugin</artifactId>
                <version>2.3.2</version>

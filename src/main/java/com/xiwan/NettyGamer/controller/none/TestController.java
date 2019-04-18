@@ -1,28 +1,32 @@
 package com.xiwan.NettyGamer.controller.none;
 
-import com.xiwan.NettyGamer.Client.ActorCache;
+import com.xiwan.NettyGamer.Enum.ServerResult;
+import com.xiwan.NettyGamer.cache.ActorCache;
+import com.xiwan.NettyGamer.controller.BaseController;
 import com.xiwan.NettyGamer.entity.Actor;
 import com.xiwan.NettyGamer.entity.RequestData;
+import com.xiwan.NettyGamer.entity.ResponseData;
+import com.xiwan.NettyGamer.entity.ResponseData.ResponseDataBuilder;
 import com.xiwan.NettyGamer.utils.Guid;
 
-public class TestController {
+public class TestController extends BaseController {
   
-  public static void Login(RequestData rd) {
-    System.out.println("Login");
-    System.out.println(rd);
-    
+  public void Login(RequestData rd) {
     String uuid = rd.getRawData().getVarTable(0);
     Actor actor = ActorCache.getActor(uuid);
     if (uuid == null || actor == null) {
       uuid = Guid.generate();
-      System.out.println(uuid);
       ActorCache.addActor(uuid);
     }else {
       
     }
+    
+    ResponseData data = SuccessData(rd);
+    data.addString(uuid);
+    SendData(rd.getSocketContext(), data);
   }
   
-  public static void Profile(RequestData rd) {
+  public void Profile(RequestData rd) {
     System.out.println("Profile");
     System.out.println(rd);
   }

@@ -1,4 +1,4 @@
-package com.xiwan.NettyGamer.Client;
+package com.xiwan.NettyGamer.cache;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 public class SystemCache {
 
-  private final static int REQUEST_QUEUE_LENGTH = 1024;
+  private final static int REQUEST_QUEUE_LENGTH = 2048;
   @Getter
   private final static BlockingQueue<RequestData> requestQueue = new ArrayBlockingQueue<RequestData>(
       REQUEST_QUEUE_LENGTH);

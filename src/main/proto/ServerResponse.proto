@@ -1,0 +1,18 @@
+syntax="proto2";
+
+package protobuf;
+
+option java_package = "com.xiwan.NettyGamer.proto";
+option java_outer_classname = "ServerResponse";
+
+message payload  {
+	required int32 Type = 1;
+	required int32 Ticket = 2;
+	repeated bool BoolList = 3;
+	repeated int32 IntList = 4;
+	repeated double DoubleList = 5;
+	repeated string StringList = 6;
+	repeated int64 DateTimeList = 7;
+	repeated bytes ByteList = 8;
+	repeated int64 SeverUnixTime = 9;
+}

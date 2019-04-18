@@ -9,10 +9,15 @@ import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 
 public class ServerRoute {
+  private ConcurrentMap<Integer, RequestRoute> routeMap = new ConcurrentHashMap<Integer, RequestRoute>();
+  private static ServerRoute instance = new ServerRoute();
+  
+  private ServerRoute() {}
+  public static ServerRoute Instance() {
+    return instance;
+  }
 
-  private static ConcurrentMap<Integer, RequestRoute> routeMap = new ConcurrentHashMap<Integer, RequestRoute>();
-
-  public static void RenewRoute(int type, int priority, Consumer<RequestData> action, ActorMode actorMode) {
+  public void RenewRoute(int type, int priority, Consumer<RequestData> action, ActorMode actorMode) {
     RequestRoute rr = new RequestRoute();
     rr.setPriority(priority);
     rr.setActorMode(actorMode);
@@ -20,11 +25,11 @@ public class ServerRoute {
     routeMap.put(type, rr);
   }
   
-  public static void RenewRoute(int type, int priority, Consumer<RequestData> action) {
+  public void RenewRoute(int type, int priority, Consumer<RequestData> action) {
     RenewRoute(type, priority, action, ActorMode.NONE);
   }
 
-  public static RequestRoute GetRoute(int actionType) {
+  public RequestRoute GetRoute(int actionType) {
     return routeMap.get(actionType);
   }
 }

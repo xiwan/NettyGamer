@@ -20,7 +20,7 @@ public class Actor {
   @Getter
   private Future currentTask;
 
-  private final int REQUEST_QUEUE_LENGTH = 1024;
+  private final int REQUEST_QUEUE_LENGTH = 2048;
   @Getter
   private BlockingQueue<RequestData> requestQueue = new ArrayBlockingQueue<RequestData>(REQUEST_QUEUE_LENGTH);
   
@@ -32,11 +32,11 @@ public class Actor {
     PushRequest(rd);
   }
   
-  public void PushRequest(RequestData rd) {
+  public boolean PushRequest(RequestData rd) {
     if (requestQueue.remainingCapacity() < Math.round(REQUEST_QUEUE_LENGTH * 0.2)) {
-      return;
+      return false;
     }
-    requestQueue.offer(rd);
+    return requestQueue.offer(rd);
   }
 
 }

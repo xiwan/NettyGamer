@@ -1,4 +1,4 @@
-package com.xiwan.NettyGamer.Client;
+package com.xiwan.NettyGamer.cache;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +12,7 @@ public class ActorCache {
   
   private static ConcurrentMap <String, Actor> actorMap = new ConcurrentHashMap<String, Actor>();
   
-  private final static int CONCURRENT_ACTOR_NUMBER = 8;
+  private final static int CONCURRENT_ACTOR_NUMBER = 2048;
   public final static ExecutorService fixedThreadExecutor = Executors.newFixedThreadPool(CONCURRENT_ACTOR_NUMBER);
   
   public static Collection<Actor> getActorList() {

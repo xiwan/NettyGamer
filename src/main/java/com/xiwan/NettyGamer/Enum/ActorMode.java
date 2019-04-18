@@ -1,5 +1,7 @@
 package com.xiwan.NettyGamer.Enum;
 
+import lombok.Getter;
+
 public enum ActorMode {
   NONE("none"),
   PASSPORT("passport"),
@@ -8,6 +10,7 @@ public enum ActorMode {
   GM("gm"),
   SERVER("server");
   
+  @Getter
   private String name;
   
   private ActorMode(String name) {

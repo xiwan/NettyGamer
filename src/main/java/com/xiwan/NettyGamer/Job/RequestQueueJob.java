@@ -3,10 +3,10 @@ package com.xiwan.NettyGamer.Job;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
-import com.xiwan.NettyGamer.Client.SystemCache;
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.base.GameServer;
 import com.xiwan.NettyGamer.base.ServerRoute;
+import com.xiwan.NettyGamer.cache.SystemCache;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 import com.xiwan.NettyGamer.utils.FixedRateTimer;
@@ -30,13 +30,13 @@ public class RequestQueueJob extends CronJob {
     if (requestQueue.size() == 0) return;
     
     RequestData rd = requestQueue.poll();
-    RequestRoute requestRoute = ServerRoute.GetRoute(rd.getActionType());
+    RequestRoute requestRoute = GameServer.Instance().GetRoute(rd.getActionType());
     if (requestRoute != null) {
       int priority = requestRoute.getPriority();
       ActorMode actorMode = requestRoute.getActorMode();
       Consumer<RequestData> action = requestRoute.getAction();
-      
       action.accept(rd);
+      
     }
   }
 
