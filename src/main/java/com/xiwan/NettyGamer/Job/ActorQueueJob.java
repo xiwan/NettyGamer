@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.base.GameServer;
-import com.xiwan.NettyGamer.base.ServerRoute;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.entity.Actor;
 import com.xiwan.NettyGamer.entity.RequestData;

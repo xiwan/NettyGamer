@@ -1,12 +1,10 @@
 package com.xiwan.NettyGamer.controller.none;
 
-import com.xiwan.NettyGamer.Enum.ServerResult;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.controller.BaseController;
 import com.xiwan.NettyGamer.entity.Actor;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.ResponseData;
-import com.xiwan.NettyGamer.entity.ResponseData.ResponseDataBuilder;
 import com.xiwan.NettyGamer.utils.Guid;
 
 public class TestController extends BaseController {

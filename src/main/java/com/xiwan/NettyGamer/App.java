@@ -1,11 +1,15 @@
 package com.xiwan.NettyGamer;
 
+import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.xiwan.NettyGamer.Enum.ServerCmd;
 import com.xiwan.NettyGamer.base.GameServer;
@@ -15,8 +19,10 @@ import com.xiwan.NettyGamer.base.GameServer;
  *
  */
 public class App {
+  static final Logger logger = LogManager.getLogger(App.class.getName());
 
   public static void main(String[] args) {
+    logger.info("xxxxx");
     System.out.println("Please type command:");
     Scanner scanner = new Scanner(System.in);
     while (scanner.hasNextLine()) {
