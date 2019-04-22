@@ -14,8 +14,6 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class BaseController {
   
-  protected static final Logger logger = LogManager.getLogger(BaseController.class);
-  
   protected void SendData(ChannelHandlerContext ctx, ResponseData data) {
     GameServer.Instance().SendData(ctx, data);
   }

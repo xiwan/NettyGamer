@@ -1,11 +1,12 @@
 package com.xiwan.NettyGamer.controller.none;
 
+import com.xiwan.NettyGamer.cache.Actor;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.controller.BaseController;
-import com.xiwan.NettyGamer.entity.Actor;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.ResponseData;
 import com.xiwan.NettyGamer.utils.Guid;
+import com.xiwan.NettyGamer.utils.LogHelper;
 
 public class TestController extends BaseController {
   
@@ -19,15 +20,14 @@ public class TestController extends BaseController {
       
     }
     
-    logger.info(uuid);
+    LogHelper.WriteInfoLog(uuid);
     ResponseData data = SuccessData(rd);
     data.addString(uuid);
     SendData(rd.getSocketContext(), data);
   }
   
   public void Profile(RequestData rd) {
-    System.out.println("Profile");
-    System.out.println(rd);
+
   }
 
 }

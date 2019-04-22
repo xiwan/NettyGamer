@@ -6,6 +6,7 @@ import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.ResponseData;
 import com.xiwan.NettyGamer.proto.ServerResponse;
+import com.xiwan.NettyGamer.utils.LogHelper;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -42,7 +43,7 @@ public abstract class ServerBase {
     try {
       if (framedServer != null)
         framedServer.stop();
-      ActorCache.fixedThreadExecutor.shutdown();
+      ActorCache.shutdown();
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

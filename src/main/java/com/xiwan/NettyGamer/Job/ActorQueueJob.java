@@ -2,13 +2,14 @@ package com.xiwan.NettyGamer.Job;
 
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.base.GameServer;
+import com.xiwan.NettyGamer.cache.Actor;
 import com.xiwan.NettyGamer.cache.ActorCache;
-import com.xiwan.NettyGamer.entity.Actor;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 
@@ -37,14 +38,15 @@ public class ActorQueueJob extends CronJob {
 
       if (actor.getCurrentTask() != null)
         continue;
+      
+      Callable<Boolean> Task = new Callable<Boolean>() {
 
-      Future currentTask = ActorCache.fixedThreadExecutor.submit(new Runnable() {
         @Override
-        public void run() {
+        public Boolean call() throws Exception {
           // TODO Auto-generated method stub
           BlockingQueue<RequestData> requestQueue = actor.getRequestQueue();
           if (requestQueue.size() == 0)
-            return;
+            return true;
           
           while(requestQueue.peek() != null) {
             RequestData rd = requestQueue.poll();
@@ -57,9 +59,10 @@ public class ActorQueueJob extends CronJob {
               action.accept(rd);
             }
           }
-
+          return true;
         }
-      });
+      };
+      Future<Boolean> currentTask = ActorCache.executeTask(Task);
 
       actor.setCurrentTask(currentTask);
 

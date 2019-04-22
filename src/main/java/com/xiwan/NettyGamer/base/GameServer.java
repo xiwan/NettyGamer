@@ -5,11 +5,12 @@ import java.util.function.Consumer;
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.Enum.ServerResult;
 import com.xiwan.NettyGamer.Job.ActorQueueJob;
+import com.xiwan.NettyGamer.Job.LogJob;
 import com.xiwan.NettyGamer.Job.RequestQueueJob;
+import com.xiwan.NettyGamer.cache.Actor;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.cache.SystemCache;
 import com.xiwan.NettyGamer.controller.none.TestController;
-import com.xiwan.NettyGamer.entity.Actor;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 import com.xiwan.NettyGamer.entity.ResponseData;
@@ -57,6 +58,7 @@ public class GameServer extends ServerBase {
   public void StartTimer() {
     RequestQueueJob.Instance().run();
     ActorQueueJob.Instance().run();
+    LogJob.Instance().run();
   }
 
   @Override

@@ -1,10 +1,12 @@
-package com.xiwan.NettyGamer.entity;
+package com.xiwan.NettyGamer.cache;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
+
+import com.xiwan.NettyGamer.entity.RequestData;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
@@ -18,7 +20,7 @@ public class Actor {
   
   @Setter
   @Getter
-  private Future currentTask;
+  private Future<Boolean> currentTask;
 
   private final int REQUEST_QUEUE_LENGTH = 2048;
   @Getter

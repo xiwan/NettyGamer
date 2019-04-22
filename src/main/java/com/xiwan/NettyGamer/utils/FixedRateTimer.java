@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.xiwan.NettyGamer.CustomThreadFactory;
 import com.xiwan.NettyGamer.Job.IJob;
 
 public class FixedRateTimer {
@@ -12,8 +13,8 @@ public class FixedRateTimer {
   private long initialDelay = 100l;
   private long period = 100l;
 
-  public FixedRateTimer(long initialDelay, long period) {
-    this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
+  public FixedRateTimer(String name, long initialDelay, long period) {
+    scheduledExecutorService = Executors.newScheduledThreadPool(1, new CustomThreadFactory(name));
     this.initialDelay = initialDelay;
     this.period = period;
   }
@@ -25,7 +26,7 @@ public class FixedRateTimer {
         cronJob.job();
       }
     };
-    
+
     scheduledExecutorService.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MILLISECONDS);
   }
 
