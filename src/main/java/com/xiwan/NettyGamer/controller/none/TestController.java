@@ -19,6 +19,7 @@ public class TestController extends BaseController {
       
     }
     
+    logger.info(uuid);
     ResponseData data = SuccessData(rd);
     data.addString(uuid);
     SendData(rd.getSocketContext(), data);

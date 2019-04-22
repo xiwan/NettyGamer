@@ -5,11 +5,9 @@
 		<!--这个输出控制台的配置 -->
 		<Console name="Console" target="SYSTEM_OUT">
 			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
-			<ThresholdFilter level="trace" onMatch="ACCEPT"
-				onMismatch="DENY" />
+			<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
 			<!--这个都知道是输出日志的格式 -->
-			<PatternLayout
-				pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n" />
 		</Console>
 		<!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用
 		<File name="log" fileName="logs/game.log" append="true"> <PatternLayout pattern="%d{HH:mm:ss.SSS} 
@@ -26,7 +24,7 @@
      to make all loggers asynchronous. -->
      
 		<!-- Async Loggers will auto-flush in batches, so switch off immediateFlush. -->
-    <RandomAccessFile name="RandomAccessFile" fileName="logs/async.log" immediateFlush="false" append="true">
+    <RandomAccessFile name="RandomAccessFile" fileName="/data/game/logs/async.log" immediateFlush="false" append="true">
       <PatternLayout>
         <Pattern>%d{yyyy-MM-dd HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n</Pattern>
       </PatternLayout>
