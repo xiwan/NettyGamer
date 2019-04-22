@@ -3,23 +3,30 @@ package com.xiwan.NettyGamer.Job;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.xiwan.NettyGamer.App;
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.cache.SystemCache;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 
+@Component("RequestQueueJob")
 public class RequestQueueJob extends CronJob {
   
-  private static RequestQueueJob instance = new RequestQueueJob();
-  
-  private RequestQueueJob() {
-    super.REQUEST_MAX_TIMEOUT = 50;
-    super.REQUEST_QUEUE_DELAY = 100;
-  }
-  
-  public static RequestQueueJob Instance() {
-    return instance;
+  @Value("#{configProperties['RequestQueueJob.REQUEST_MAX_TIMEOUT']}")
+  private int timeout;
+  @Value("#{configProperties['RequestQueueJob.REQUEST_QUEUE_DELAY']}")
+  private int delay;
+
+  @PostConstruct
+  @Override
+  public void init() {
+    this.REQUEST_MAX_TIMEOUT = timeout;
+    this.REQUEST_QUEUE_DELAY = delay;      
   }
   
   @Override
@@ -37,5 +44,6 @@ public class RequestQueueJob extends CronJob {
       
     }
   }
+
 
 }

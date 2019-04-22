@@ -1,13 +1,10 @@
 package com.xiwan.NettyGamer;
 
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -27,7 +24,7 @@ public class App {
   
   static {
     //context = new AnnotationConfigApplicationContext(AppConfig.class);
-    context = new ClassPathXmlApplicationContext(new String[] {"Spring-Customer.xml"});
+    context = new ClassPathXmlApplicationContext(new String[] {"app-context.dev.xml"});
     ex = Executors.newCachedThreadPool(new CustomThreadFactory(App.class.getSimpleName()));
     latch = new CountDownLatch(5);
     gameServer = context.getBean("GameServer", GameServer.class);
@@ -35,14 +32,13 @@ public class App {
   }
 
   public static void main(String[] args) {
-    StartCountdown();
-    DefaultCommand();
+    LogHelper.WriteInfoLog("Please type command [start, stop] or auto-start in 5 secs:");
     ParseCommand();
+    DefaultCommand();
+    StartCountdown();
   }
 
   private static void ParseCommand() {
-    LogHelper.WriteInfoLog("Please type command [auto-start in 5 secs]:");
-
     Runnable task = new Runnable() {
       @Override
       public void run() {

@@ -6,6 +6,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.xiwan.NettyGamer.App;
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.cache.Actor;
@@ -13,19 +18,21 @@ import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 
+@Component("ActorQueueJob")
 public class ActorQueueJob extends CronJob {
-
-  private static ActorQueueJob instance = new ActorQueueJob();
-
-  private ActorQueueJob() {
-    super.REQUEST_MAX_TIMEOUT = 50;
-    super.REQUEST_QUEUE_DELAY = 100;
+  
+  @Value("#{configProperties['ActorQueueJob.REQUEST_MAX_TIMEOUT']}")
+  private int timeout;
+  @Value("#{configProperties['ActorQueueJob.REQUEST_QUEUE_DELAY']}")
+  private int delay;
+  
+  @PostConstruct
+  @Override
+  public void init() {
+    this.REQUEST_MAX_TIMEOUT = timeout;
+    this.REQUEST_QUEUE_DELAY = delay;  
   }
-
-  public static ActorQueueJob Instance() {
-    return instance;
-  }
-
+  
   @Override
   public void job() {
 

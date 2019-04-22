@@ -20,6 +20,7 @@ import com.xiwan.NettyGamer.entity.ResponseData;
 import com.xiwan.NettyGamer.entity.ResponseData.ResponseDataBuilder;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -31,6 +32,12 @@ public class GameServer extends ServerBase {
   private ServerRoute routeTable;
   @Autowired
   private TestController testController;
+  @Autowired
+  private LogJob logJob;
+  @Autowired
+  private ActorQueueJob actorQueueJob;
+  @Autowired
+  private RequestQueueJob requestQueueJob;
 
   public RequestRoute GetRoute(int actionType) {
     return routeTable.GetRoute(actionType);
@@ -55,9 +62,9 @@ public class GameServer extends ServerBase {
 
   @Override
   public void StartTimer() {
-    RequestQueueJob.Instance().run();
-    ActorQueueJob.Instance().run();
-    LogJob.Instance().run();
+    requestQueueJob.run();
+    actorQueueJob.run();
+    logJob.run();
   }
 
   @Override
@@ -108,6 +115,7 @@ public class GameServer extends ServerBase {
     byte[] out = data.toByteArray();
     ByteBuf buf = Unpooled.buffer(out.length, out.length);
     buf.writeBytes(out);
+    // System.out.println(ByteBufUtil.hexDump(buf));
     ctx.writeAndFlush(buf);
   }
 

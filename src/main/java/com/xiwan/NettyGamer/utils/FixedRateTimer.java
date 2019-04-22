@@ -10,8 +10,8 @@ import com.xiwan.NettyGamer.Job.IJob;
 public class FixedRateTimer {
 
   private ScheduledExecutorService scheduledExecutorService;
-  private long initialDelay = 100l;
-  private long period = 100l;
+  private long initialDelay = 1000l;
+  private long period = 1000l;
 
   public FixedRateTimer(String name, long initialDelay, long period) {
     scheduledExecutorService = Executors.newScheduledThreadPool(1, new CustomThreadFactory(name));

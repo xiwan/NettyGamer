@@ -2,6 +2,7 @@ package com.xiwan.NettyGamer.Job;
 
 public interface IJob {
   
-  public void job();
+  public void init();
 
+  public void job();
 }

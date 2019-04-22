@@ -1,6 +1,7 @@
 package com.xiwan.NettyGamer.Job;
 
 import com.xiwan.NettyGamer.utils.FixedRateTimer;
+import com.xiwan.NettyGamer.utils.LogHelper;
 
 public abstract class CronJob implements IJob {
 
@@ -9,8 +10,10 @@ public abstract class CronJob implements IJob {
   protected int REQUEST_QUEUE_DELAY = 1000;
 
   public void run() {
-    FixedRateTimer fixedRateTimer = new FixedRateTimer(JobName + this.getClass().getSimpleName(), REQUEST_MAX_TIMEOUT,
-        REQUEST_QUEUE_DELAY);
+    String jobName = JobName + this.getClass().getSimpleName();
+    LogHelper.WriteInfoLog(String.format("JOB[%s] timeout[%d] delay[%d]", jobName, this.REQUEST_MAX_TIMEOUT, this.REQUEST_QUEUE_DELAY));
+    FixedRateTimer fixedRateTimer = new FixedRateTimer(jobName, this.REQUEST_MAX_TIMEOUT,
+        this.REQUEST_QUEUE_DELAY);
     fixedRateTimer.execute(this);
   }
 
