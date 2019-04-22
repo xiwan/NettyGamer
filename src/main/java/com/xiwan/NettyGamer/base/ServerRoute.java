@@ -4,10 +4,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
+import org.springframework.stereotype.Component;
+
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 
+@Component("ServerRoute")
 public class ServerRoute {
   private ConcurrentMap<Integer, RequestRoute> routeMap = new ConcurrentHashMap<Integer, RequestRoute>();
   private static ServerRoute instance = new ServerRoute();

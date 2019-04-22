@@ -7,7 +7,7 @@ public class LogJob extends CronJob {
   private static LogJob instance = new LogJob();
   
   private LogJob() {
-    this.REQUEST_MAX_TIMEOUT = 50;
+    this.REQUEST_MAX_TIMEOUT = 100;
     this.REQUEST_QUEUE_DELAY = 1000;
   }
   

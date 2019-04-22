@@ -44,11 +44,11 @@ public class LogHelper {
   public static void WriteInfoLog(String log) {
     LogData logData = new LogData();
     logData.setContent(log);
-    CommonLogEnqueue(infoQueue, log);
+    CommonLogEnqueue(infoQueue, JSON.toJSONString(logData));
   }
   
-  public static void WriteInfoLog(LogData log) {
-    CommonLogEnqueue(infoQueue, JSON.toJSONString(log));
+  public static void WriteInfoLog(LogData logData) {
+    CommonLogEnqueue(infoQueue, JSON.toJSONString(logData));
   }
 
   public static void WriteDebugLog(String log) {

@@ -6,8 +6,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import com.xiwan.NettyGamer.App;
 import com.xiwan.NettyGamer.Enum.ActorMode;
-import com.xiwan.NettyGamer.base.GameServer;
 import com.xiwan.NettyGamer.cache.Actor;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.entity.RequestData;
@@ -50,7 +50,7 @@ public class ActorQueueJob extends CronJob {
           
           while(requestQueue.peek() != null) {
             RequestData rd = requestQueue.poll();
-            RequestRoute requestRoute = GameServer.Instance().GetRoute(rd.getActionType());
+            RequestRoute requestRoute = App.gameServer.GetRoute(rd.getActionType());
             if (requestRoute != null) {
               int priority = requestRoute.getPriority();
               ActorMode actorMode = requestRoute.getActorMode();

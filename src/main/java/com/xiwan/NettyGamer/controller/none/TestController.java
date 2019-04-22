@@ -1,5 +1,8 @@
 package com.xiwan.NettyGamer.controller.none;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+
 import com.xiwan.NettyGamer.cache.Actor;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.controller.BaseController;
@@ -8,6 +11,7 @@ import com.xiwan.NettyGamer.entity.ResponseData;
 import com.xiwan.NettyGamer.utils.Guid;
 import com.xiwan.NettyGamer.utils.LogHelper;
 
+@Controller("TestController")
 public class TestController extends BaseController {
   
   public void Login(RequestData rd) {

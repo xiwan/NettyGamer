@@ -6,8 +6,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.xiwan.NettyGamer.Enum.ServerCmd;
 import com.xiwan.NettyGamer.base.GameServer;
@@ -18,10 +20,19 @@ import com.xiwan.NettyGamer.utils.LogHelper;
  *
  */
 public class App {
+  static AbstractApplicationContext context;
+  static CountDownLatch latch;
+  static ExecutorService ex;
+  public static GameServer gameServer;
   
-  static CountDownLatch latch = new CountDownLatch(5);
-  static ExecutorService ex = Executors.newCachedThreadPool(new CustomThreadFactory(App.class.getSimpleName()));
-  // ExecutorCompletionService cs = new ExecutorCompletionService(ex);
+  static {
+    //context = new AnnotationConfigApplicationContext(AppConfig.class);
+    context = new ClassPathXmlApplicationContext(new String[] {"Spring-Customer.xml"});
+    ex = Executors.newCachedThreadPool(new CustomThreadFactory(App.class.getSimpleName()));
+    latch = new CountDownLatch(5);
+    gameServer = context.getBean("GameServer", GameServer.class);
+    
+  }
 
   public static void main(String[] args) {
     StartCountdown();
@@ -106,24 +117,29 @@ public class App {
   }
 
   private static void StartServer() {
-    if (GameServer.Instance().isRunning) {
-      LogHelper.WriteDebugLog("server is running...");
+    if (gameServer.isRunning) {
+      LogHelper.WriteDebugLog("server is running");
       return;
     }
 
-    GameServer.Instance().Initialize("");
-    GameServer.Instance().StartServer();
-    GameServer.Instance().StartTimer();
-    GameServer.Instance().isRunning = true;
+    gameServer.Initialize("");
+    gameServer.StartServer();
+    gameServer.StartTimer();
+    gameServer.isRunning = true;
     
-    LogHelper.WriteInfoLog(String.format("start [%s]", GameServer.Instance().isRunning));
+    LogHelper.WriteInfoLog(String.format("start [%s]", gameServer.isRunning));
   }
 
   private static void ShutdownServer() {
     try {
-      GameServer.Instance().ShutdownServer();
-      GameServer.Instance().isRunning = false;
-      LogHelper.WriteInfoLog(String.format("exit [%s]", !GameServer.Instance().isRunning));
+      if (!gameServer.isRunning) {
+        LogHelper.WriteDebugLog("server has stopped");
+        return;
+      }
+      
+      gameServer.ShutdownServer();
+      gameServer.isRunning = false;
+      LogHelper.WriteInfoLog(String.format("exit [%s]", !gameServer.isRunning));
       
     } finally {
       ex.shutdown();

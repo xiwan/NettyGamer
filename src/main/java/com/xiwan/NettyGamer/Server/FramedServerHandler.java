@@ -33,7 +33,7 @@ public class FramedServerHandler extends ChannelInboundHandlerAdapter {
       buf = ctx.alloc().buffer(in.readableBytes());
       buf.writeBytes(in);
       if (buf.readableBytes() >= HEADER_LENGTH + TICKET_LENGTH) {
-        //System.out.println(ByteBufUtil.hexDump(buf));
+        // System.out.println(ByteBufUtil.hexDump(buf));
         int length = buf.readInt(); // HEADER_LENGTH
         int ticket = buf.readInt(); // TICKET_LENGTH
         byte[] b = new byte[buf.readableBytes()];

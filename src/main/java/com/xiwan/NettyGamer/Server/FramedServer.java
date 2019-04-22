@@ -30,8 +30,8 @@ public class FramedServer {
   private Consumer<RequestData> receiveAction;
   private Consumer<ChannelHandlerContext> disconnectAction;
 
-  public FramedServer(int port, int maxPackageSize, int maxReaderIdleTime, int maxWriterIdleTime, int maxAllIdleTime, Consumer<RequestData> receiveAction,
-      Consumer<ChannelHandlerContext> disconnectAction) {
+  public FramedServer(int port, int maxPackageSize, int maxReaderIdleTime, int maxWriterIdleTime, int maxAllIdleTime,
+      Consumer<RequestData> receiveAction, Consumer<ChannelHandlerContext> disconnectAction) {
     this.port = port;
     this.maxPackageSize = maxPackageSize;
     this.maxReaderIdleTime = maxReaderIdleTime;

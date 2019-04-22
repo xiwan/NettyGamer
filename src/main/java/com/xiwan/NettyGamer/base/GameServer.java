@@ -2,6 +2,9 @@ package com.xiwan.NettyGamer.base;
 
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.Enum.ServerResult;
 import com.xiwan.NettyGamer.Job.ActorQueueJob;
@@ -20,18 +23,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 
+@Component("GameServer")
 public class GameServer extends ServerBase {
 
-  private static GameServer instance = new GameServer();
-  
-  private ServerRoute routeTable = ServerRoute.Instance();
   public Boolean isRunning = false;
-
-  private GameServer() {};
-
-  public static GameServer Instance() {
-    return instance;
-  }
+  @Autowired
+  private ServerRoute routeTable;
+  @Autowired
+  private TestController testController;
 
   public RequestRoute GetRoute(int actionType) {
     return routeTable.GetRoute(actionType);
@@ -49,9 +48,9 @@ public class GameServer extends ServerBase {
 
   @Override
   public void LocalizeRequestRouteTable() {
-    TestController TestController = new TestController();
-    routeTable.RenewRoute(0x0010, 0, (rd) -> TestController.Login(rd));
-    routeTable.RenewRoute(0xEE0000, 0, (rd) -> TestController.Profile(rd), ActorMode.GAMER);
+    
+    routeTable.RenewRoute(0x0010, 0, (rd) -> testController.Login(rd));
+    routeTable.RenewRoute(0xEE0000, 0, (rd) -> testController.Profile(rd), ActorMode.GAMER);
   }
 
   @Override
@@ -85,7 +84,7 @@ public class GameServer extends ServerBase {
 
   @Override
   public void ReceiveData(RequestData rd) {
-    RequestRoute requestRoute = ServerRoute.Instance().GetRoute(rd.getActionType());
+    RequestRoute requestRoute = routeTable.GetRoute(rd.getActionType());
     if (requestRoute != null) {
       int priority = requestRoute.getPriority();
       Consumer<RequestData> action = requestRoute.getAction();
