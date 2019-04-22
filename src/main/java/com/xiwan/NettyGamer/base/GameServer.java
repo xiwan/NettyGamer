@@ -24,6 +24,7 @@ public class GameServer extends ServerBase {
   private static GameServer instance = new GameServer();
   
   private ServerRoute routeTable = ServerRoute.Instance();
+  public Boolean isRunning = false;
 
   private GameServer() {};
 

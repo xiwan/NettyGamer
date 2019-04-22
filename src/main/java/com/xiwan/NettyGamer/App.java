@@ -1,10 +1,13 @@
 package com.xiwan.NettyGamer;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,20 +24,75 @@ import com.xiwan.NettyGamer.base.GameServer;
  */
 public class App {
   static final Logger logger = LogManager.getLogger(App.class.getName());
-  static CountDownLatch latch = new CountDownLatch(3);
+  static CountDownLatch latch = new CountDownLatch(5);
+  static ExecutorService ex = Executors.newCachedThreadPool(new CustomThreadFactory(App.class.getSimpleName()));
+  // ExecutorCompletionService cs = new ExecutorCompletionService(ex);
 
-  public static void main(String[] args) { 
-    System.out.println("Please type command [auto-start in 3 secs]:");
+  public static void main(String[] args) {
     StartCountdown();
-    Scanner scanner = new Scanner(System.in);
-    while (scanner.hasNextLine()) {
-      String cmd = scanner.nextLine();
-      App.runCommand(cmd.trim());
-    }
-    scanner.close();
+    DefaultCommand();
+    ParseCommand();
   }
 
-  public static void runCommand(String cmd) {
+  private static void ParseCommand() {
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        // TODO Auto-generated method stub
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+          String cmd = scanner.nextLine();
+          App.runCommand(cmd.trim());
+        }
+        scanner.close();
+      }
+    };
+    ex.execute(task);
+  }
+
+  private static void DefaultCommand() {
+    logger.info("Please type command [auto-start in 5 secs]:");
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        // TODO Auto-generated method stub
+        if (latch.getCount() == 0)
+          return;
+        try {
+          latch.await();
+        } catch (InterruptedException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+        String cmd = "start";
+        App.runCommand(cmd);
+      }
+    };
+    ex.execute(task);
+  }
+
+  private static void StartCountdown() {
+
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        // TODO Auto-generated method stub
+        while (latch.getCount() > 0) {
+          latch.countDown();
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+        }
+      }
+    };
+    ex.execute(task);
+  }
+  
+
+  private static void runCommand(String cmd) {
     logger.info("exec: " + cmd);
     switch (ServerCmd.getCmd(cmd))
       {
@@ -50,63 +108,38 @@ public class App {
       default:
         break;
       }
-
   }
 
   private static void StartServer() {
+    if (GameServer.Instance().isRunning) {
+      logger.info("server is running...");
+      return;
+    }
+
     GameServer.Instance().Initialize("");
     GameServer.Instance().StartServer();
     GameServer.Instance().StartTimer();
+    GameServer.Instance().isRunning = true;
     logger.info("done");
   }
 
   private static void ShutdownServer() {
-    ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-    Future<Boolean> task = singleThreadExecutor.submit(new Callable<Boolean>() {
+    Future<Boolean> task = ex.submit(new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
         GameServer.Instance().ShutdownServer();
+        GameServer.Instance().isRunning = false;
         return true;
       }
     });
     try {
       boolean result = task.get() || task.isDone();
-      logger.info(String.format("exit: %s", result));
+      logger.info(String.format("running [%s] exit [%s]", GameServer.Instance().isRunning, result));
     } catch (InterruptedException | ExecutionException e) {
       task.cancel(true);
     } finally {
-      singleThreadExecutor.shutdown();
+      ex.shutdown();
       System.exit(0);
-    }
-  }
-
-  private static void StartCountdown() {
-    ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-    singleThreadExecutor.execute(new Runnable() {
-      @Override
-      public void run() {
-        // TODO Auto-generated method stub
-        while (latch.getCount() > 0) {
-          latch.countDown();
-          try {
-            Thread.sleep(1000);
-          } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-        }
-      }
-    });
-    
-    if (latch.getCount() > 0) {
-      try {
-        latch.await();
-      } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      String cmd = "start";
-      App.runCommand(cmd);
     }
   }
 
