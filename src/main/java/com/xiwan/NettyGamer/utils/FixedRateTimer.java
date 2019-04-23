@@ -12,9 +12,16 @@ import java.util.function.Consumer;
 import com.xiwan.NettyGamer.Job.CronJob;
 import com.xiwan.NettyGamer.Job.IJob;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class FixedRateTimer {
 
+  @Getter
   private ScheduledExecutorService scheduledExecutorService;
+  @Getter
+  @Setter
+  private Future currentTask;
   private long initialDelay = 1000l;
   private long period = 1000l;
 
@@ -24,15 +31,8 @@ public class FixedRateTimer {
     this.period = period;
   }
 
-  public Future execute(CustomJob job) {
+  public Future execute(CronJob job) {
     return scheduledExecutorService.scheduleAtFixedRate(job, initialDelay, period, TimeUnit.MILLISECONDS);
-  }
-  
-  public Boolean cancel(Future future) {
-    if (future != null && (future.isCancelled() || future.isCancelled())) {
-      return true;
-    }
-    return future.cancel(false);
   }
 
 }

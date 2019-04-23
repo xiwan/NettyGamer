@@ -19,6 +19,7 @@ import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.entity.RequestRoute;
 import com.xiwan.NettyGamer.entity.ResponseData;
 import com.xiwan.NettyGamer.entity.ResponseData.ResponseDataBuilder;
+import com.xiwan.NettyGamer.utils.LogHelper;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -28,7 +29,6 @@ import io.netty.channel.ChannelHandlerContext;
 @Component("GameServer")
 public class GameServer extends ServerBase {
 
-  public Boolean isRunning = false;
   @Autowired
   private ServerRoute routeTable;
   @Autowired
@@ -46,11 +46,19 @@ public class GameServer extends ServerBase {
   
   @Override
   public void StartServer() {
+    if (this.isRunning) {
+      LogHelper.WriteDebugLog("server is running");
+      return;
+    }
     Start();
   }
 
   @Override
   public void ShutdownServer() {
+    if (!this.isRunning) {
+      LogHelper.WriteDebugLog("server has stopped");
+      return;
+    }
     Shutdown();
   }
 
@@ -63,11 +71,16 @@ public class GameServer extends ServerBase {
 
   @Override
   public void StartTimer() {
-    requestQueueJob.register((rd)->requestQueueJob.job());
-    actorQueueJob.register((rd)->actorQueueJob.job());
-    logJob.register((rd)->logJob.job());
-    
-    CronJob.startAll();
+    requestQueueJob.start();
+    actorQueueJob.start();
+    logJob.start();
+  }
+  
+  @Override
+  public void StopTimer() {
+    requestQueueJob.stop();
+    actorQueueJob.stop();
+    logJob.stop();
   }
 
   @Override

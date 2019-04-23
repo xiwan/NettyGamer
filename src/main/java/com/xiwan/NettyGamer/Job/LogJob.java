@@ -28,4 +28,15 @@ public class LogJob extends CronJob {
     LogHelper.SaveLog();
   }
 
+  @Override
+  public void shutdown() {
+    // TODO Auto-generated method stub
+    try {
+      LogHelper.FlushLog();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
 }

@@ -41,9 +41,13 @@ public class RequestQueueJob extends CronJob {
       ActorMode actorMode = requestRoute.getActorMode();
       Consumer<RequestData> action = requestRoute.getAction();
       action.accept(rd);
-      
     }
   }
 
+  @Override
+  public void shutdown() {
+    // TODO Auto-generated method stub
+    
+  }
 
 }

@@ -70,11 +70,16 @@ public class ActorQueueJob extends CronJob {
         }
       };
       Future<Boolean> currentTask = ActorCache.executeTask(Task);
-
       actor.setCurrentTask(currentTask);
-
     }
 
   }
+
+  @Override
+  public void shutdown() {
+    // TODO Auto-generated method stub
+    ActorCache.shutdown();
+  }
+
 
 }

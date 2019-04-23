@@ -1,6 +1,7 @@
 package com.xiwan.NettyGamer.base;
 
 import com.xiwan.NettyGamer.Enum.ActorMode;
+import com.xiwan.NettyGamer.Job.CronJob;
 import com.xiwan.NettyGamer.Server.FramedServer;
 import com.xiwan.NettyGamer.cache.ActorCache;
 import com.xiwan.NettyGamer.entity.RequestData;
@@ -14,6 +15,7 @@ public abstract class ServerBase {
 
   public String version;
   public int port;
+  public Boolean isRunning = false;
   protected int maxPackageSize;
   protected int maxReaderIdleTime = 0;
   protected int maxWriterIdleTime = 0;
@@ -36,6 +38,10 @@ public abstract class ServerBase {
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+    } finally {
+      this.isRunning = true;
+      LogHelper.WriteInfoLog(String.format("start [%s]", this.isRunning));
+      StartTimer();
     }
   }
 
@@ -43,10 +49,13 @@ public abstract class ServerBase {
     try {
       if (framedServer != null)
         framedServer.stop();
-      ActorCache.shutdown();
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+    }finally {
+      this.isRunning = false;
+      LogHelper.WriteInfoLog(String.format("exit [%s]", !this.isRunning));
+      StopTimer();
     }
   }
 
@@ -57,8 +66,10 @@ public abstract class ServerBase {
   public abstract void StartServer();
 
   public abstract void ShutdownServer();
-
+  
   public abstract void StartTimer();
+  
+  public abstract void StopTimer();
 
   public abstract void LocalizeRequestRouteTable();
   

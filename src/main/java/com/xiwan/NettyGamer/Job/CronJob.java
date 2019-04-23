@@ -1,48 +1,72 @@
 package com.xiwan.NettyGamer.Job;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import com.xiwan.NettyGamer.utils.CustomJob;
 import com.xiwan.NettyGamer.utils.FixedRateTimer;
 import com.xiwan.NettyGamer.utils.LogHelper;
 
-public abstract class CronJob implements IJob {
+public abstract class CronJob implements IJob, Runnable {
 
   protected String JobName = "CronJob-";
   public int REQUEST_MAX_TIMEOUT = 1000;
   public int REQUEST_QUEUE_DELAY = 1000;
 
-  public void register(Consumer consumerTask) {
-    CustomJob job = new CustomJob();
-    job.setName(JobName + this.getClass().getSimpleName());
-    job.setConsumerTask(consumerTask);
-    job.setDelay(this.REQUEST_MAX_TIMEOUT);
-    job.setTimeout(this.REQUEST_QUEUE_DELAY);
+  protected FixedRateTimer timer;
+  protected Consumer consumerTask;
 
-    jobList.add(job);
-
+  private void register() {
+    this.JobName = this.JobName + this.getClass().getSimpleName();
+    this.consumerTask = (rd) -> this.job();
   }
 
-  public static void startAll() {
-    for (CustomJob job : jobList) {
-      FixedRateTimer fixedRateTimer = new FixedRateTimer(job.getName(), job.getTimeout(), job.getDelay());
-      job.setCurrentTask(fixedRateTimer.execute(job));
-      LogHelper.WriteDebugLog(String.format("START JOB[%s] timeout[%d] delay[%d] result[%s]", job.getName(),
-          job.getTimeout(), job.getTimeout(), job.getCurrentTask() != null));
-    }
+  public void start() {
+    register();
+    
+    this.timer = new FixedRateTimer(this.JobName, this.REQUEST_MAX_TIMEOUT, this.REQUEST_QUEUE_DELAY);
+    this.timer.setCurrentTask(this.timer.execute(this));
+    LogHelper.WriteDebugLog(String.format("START JOB[%s] timeout[%d] delay[%d] result[%s]", this.JobName,
+        this.REQUEST_MAX_TIMEOUT, this.REQUEST_QUEUE_DELAY, this.timer.getCurrentTask() != null));
   }
 
-  public static void stopAll() {
-    for (CustomJob job : jobList) {
-      Future future = job.getCurrentTask();
-      if (future != null && (future.isCancelled() || future.isCancelled())) {
-        return;
-      }
-      Boolean result = future.cancel(false);
-      LogHelper.WriteDebugLog(String.format("STOP JOB[%s] timeout[%d] delay[%d] result[%s]", job.getName(),
-          job.getTimeout(), job.getTimeout(), result));
+  public void stop() {
+    String log = String.format("STOP JOB[%s] timeout[%d] delay[%d]", this.JobName,
+        this.REQUEST_MAX_TIMEOUT, this.REQUEST_QUEUE_DELAY);
+    LogHelper.WriteDebugLog(log);
+    
+    shutdown();
+    Future future = this.timer.getCurrentTask();
+    if (future != null && (future.isCancelled() || future.isCancelled())) {
+      this.timer.setCurrentTask(null);
     }
+    
+    if (future != null) {
+      future.cancel(false);
+      this.timer.setCurrentTask(null);
+    }
+    ScheduledExecutorService ex = this.timer.getScheduledExecutorService();
+    List<Runnable> remainList = ex.shutdownNow();
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    if (remainList == null || (ex.isShutdown() && ex.isTerminated())) {
+      //System.out.println(log);
+    }
+  }
+  
+
+  @Override
+  public void run() {
+    // TODO Auto-generated method stub
+    this.consumerTask.accept(null);
   }
 
 }

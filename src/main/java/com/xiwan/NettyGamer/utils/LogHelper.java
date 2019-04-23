@@ -9,6 +9,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +22,8 @@ import com.xiwan.NettyGamer.entity.LogData;
 public class LogHelper {
   private static final Logger logger = LogManager.getLogger();
 
-  static ExecutorService ex = Executors.newCachedThreadPool(new CustomThreadFactory(LogHelper.class.getSimpleName()));
+  static ExecutorService ex;
+  static List<Future> futureList = new ArrayList<>();
   private final static int QUEUE_LENGTH = 100000;
 
   private final static BlockingQueue<String> infoQueue;
@@ -62,10 +65,17 @@ public class LogHelper {
     CommonLogEnqueue(errorQueue, sb.toString());
   }
   
-  public static void FlushLog() throws InterruptedException {
-    while(infoQueue.size() > 0 || debugQueue.size() > 0 || errorQueue.size() > 0)
+  public static Boolean FlushLog() throws Exception {
+    while(infoQueue.size() > 0 || debugQueue.size() > 0 || errorQueue.size() > 0) {
       Thread.sleep(1000);
-    ex.shutdown();
+    }
+    futureList.clear();
+    
+    List<Runnable> remainList = ex.shutdownNow();
+    if (remainList == null || (ex.isShutdown() && ex.isTerminated())) {
+      return true;
+    }
+    return false;
   }
 
   public static void SaveLog() {
@@ -111,9 +121,13 @@ public class LogHelper {
     taskList.add(infoTask);
     taskList.add(debugTask);
     taskList.add(errorTask);
-
+    
+    if (ex == null || ex.isShutdown() || ex.isTerminated()) {
+      ex = Executors.newCachedThreadPool(new CustomThreadFactory(LogHelper.class.getSimpleName()));
+    }
+    
     for (Runnable task : taskList) {
-      ex.execute(task);
+      futureList.add(ex.submit(task));
     }
   }
 
