@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="error">
+	<!--先定义所有的appender -->
+	<appenders>
+		<!--这个输出控制台的配置 -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
+			<ThresholdFilter level="info" onMatch="ACCEPT"
+				onMismatch="DENY" />
+			<!--这个都知道是输出日志的格式 -->
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n" />
+		</Console>
+
+		<RollingFile name="RollingFileInfo" fileName="logs/app-info.log"
+			filePattern="logs/$${date:yyyy-MM}/app-info-%d{yyyyMMddHH}.log.gz">
+			<LevelRangeFilter minLevel="info" maxLevel="info"
+				onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout
+				pattern="%msg%xEx%n" />
+			<TimeBasedTriggeringPolicy interval="1"
+				modulate="true" />
+		</RollingFile>
+		
+		<RollingFile name="RollingFileDebug" fileName="logs/app-debug.log"
+			filePattern="logs/$${date:yyyy-MM}/app-debug-%d{yyyyMMddHH}.log.gz">
+			<LevelRangeFilter minLevel="debug" maxLevel="debug"
+				onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout
+				pattern="%msg%xEx%n" />
+			<TimeBasedTriggeringPolicy interval="1"
+				modulate="true" />
+		</RollingFile>
+		
+		 <RollingFile name="RollingFileError" fileName="logs/app-error.log"
+			filePattern="logs/$${date:yyyy-MM}/app-error-%d{yyyyMMddHH}.log.gz">
+			<LevelRangeFilter minLevel="error" maxLevel="error"
+				onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout
+				pattern="%msg%xEx%n" />
+			<TimeBasedTriggeringPolicy interval="1"
+				modulate="true" />
+		</RollingFile>
+
+		<!-- Don't forget to set system property -Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector 
+			to make all loggers asynchronous. -->
+
+		<!-- Async Loggers will auto-flush in batches, so switch off immediateFlush. -->
+		<RandomAccessFile name="RandomAccessFileInfo"
+			fileName="logs/async-info.log" immediateFlush="true" append="true">
+			<LevelRangeFilter minLevel="info" maxLevel="info"
+				onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss z} %-5level %class{36} %L %M -
+					%msg%xEx%n</Pattern>
+			</PatternLayout>
+		</RandomAccessFile>
+
+		<RandomAccessFile name="RandomAccessFileDebug"
+			fileName="logs/async-debug.log" immediateFlush="true" append="true">
+			<LevelRangeFilter minLevel="debug" maxLevel="debug"
+				onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss z} %-5level %class{36} %L %M -
+					%msg%xEx%n</Pattern>
+			</PatternLayout>
+		</RandomAccessFile>
+
+		<RandomAccessFile name="RandomAccessFileError"
+			fileName="logs/async-error.log" immediateFlush="true" append="true">
+			<LevelRangeFilter minLevel="error" maxLevel="error"
+				onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss z} %-5level %class{36} %L %M -
+					%msg%xEx%n</Pattern>
+			</PatternLayout>
+		</RandomAccessFile>
+
+	</appenders>
+	<!--然后定义logger，只有定义了logger并引入的appender，appender才会生效 -->
+	<loggers>
+		<!--建立一个默认的root的logger -->
+		<root level="debug">
+			<appender-ref ref="Console" />
+			<appender-ref ref="RandomAccessFileInfo" />
+			<appender-ref ref="RandomAccessFileDebug" />
+			<appender-ref ref="RandomAccessFileError" />
+		</root>
+	</loggers>
+</configuration>

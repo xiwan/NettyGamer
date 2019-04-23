@@ -4,7 +4,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.xiwan.NettyGamer.CustomThreadFactory;
 import com.xiwan.NettyGamer.Job.IJob;
 
 public class FixedRateTimer {

@@ -1,4 +1,4 @@
-package com.xiwan.NettyGamer;
+package com.xiwan.NettyGamer.utils;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

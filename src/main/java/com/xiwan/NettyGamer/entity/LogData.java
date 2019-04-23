@@ -2,18 +2,23 @@ package com.xiwan.NettyGamer.entity;
 
 import java.util.Date;
 
+import com.xiwan.NettyGamer.Enum.LogType;
+import com.xiwan.NettyGamer.utils.DateTimeHelper;
+
 import lombok.Data;
 
 @Data
 public class LogData {
+  
+  protected int Type;
   
   protected String DateTime;
 
   protected String Content;
   
   public LogData() {
-    java.text.DateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-    this.DateTime = format.format(new Date());
+    this.Type = LogType.Unknown.getCode();
+    this.DateTime = DateTimeHelper.convertDateTime(new Date());
   }
   
 }

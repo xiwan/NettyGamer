@@ -1,44 +1,101 @@
 package com.xiwan.NettyGamer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.xiwan.NettyGamer.Enum.ServerCmd;
+import com.xiwan.NettyGamer.Enum.ServerEnv;
 import com.xiwan.NettyGamer.base.GameServer;
+import com.xiwan.NettyGamer.utils.CustomThreadFactory;
 import com.xiwan.NettyGamer.utils.LogHelper;
 
-/**
- * Hello world!
- *
- */
 public class App {
-  static AbstractApplicationContext context;
-  static CountDownLatch latch;
   static ExecutorService ex;
+  static String env;
+  static String cmd;
   public static GameServer gameServer;
-  
+
   static {
-    //context = new AnnotationConfigApplicationContext(AppConfig.class);
-    context = new ClassPathXmlApplicationContext(new String[] {"app-context.dev.xml"});
     ex = Executors.newCachedThreadPool(new CustomThreadFactory(App.class.getSimpleName()));
-    latch = new CountDownLatch(5);
+  }
+
+  public static void main(String[] args) throws ParseException, FileNotFoundException {
+    ParseCommandLine(args);
+    InitLogConfig();
+    InitGamerServer();
+  }
+
+  private static void ParseCommandLine(String[] args) throws ParseException {
+    Options options = new Options();
+    options.addOption("h", "help", false, "Print this usage information");
+    options.addOption("v", "verbose", false, "Print out VERBOSE information");
+    // options.addOption("f", "file", true, "File to save program output to");
+    @SuppressWarnings("static-access")
+    Option property = OptionBuilder.withArgName("property=value").hasArgs(2).withValueSeparator()
+        .withDescription("use value for given property(property=value)").create("D");
+    property.setRequired(false);
+    options.addOption(property);
+
+    // print usage
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("AntOptsCommonsCLI", options);
+
+    CommandLineParser parser = new PosixParser();
+    CommandLine cmdLine = parser.parse(options, args);
+
+    String env = cmdLine.getOptionProperties("D").getProperty("nettygamer.env");
+    String cmd = cmdLine.getOptionProperties("D").getProperty("nettygamer.cmd");
+
+    App.env = ServerEnv.getEnv(env).name().toLowerCase();
+    App.cmd = ServerCmd.getCmd(cmd).name().toLowerCase();
+
+  }
+  
+  private static void InitLogConfig() throws FileNotFoundException {
+    String separator = System.getProperty("file.separator");
+    String logConfigRelative = String.format("src%smain%sresources%s", separator, separator, separator);
+    String logConfigFileName = String.format("log4j2.%s.xml", App.env); 
+    String relativePath = logConfigRelative + logConfigFileName;
+
+    File log4jFile = new File(System.getProperty("user.dir") + separator + relativePath);
+    if (log4jFile.exists()) {
+      ConfigurationSource source = new ConfigurationSource(new FileInputStream(log4jFile), log4jFile);
+      Configurator.initialize(null, source);
+    }
+  }
+
+  private static void InitGamerServer() {
+    String contextFileName = String.format("app-context.%s.xml", App.env);
+    @SuppressWarnings("resource")
+    AbstractApplicationContext context = new ClassPathXmlApplicationContext(contextFileName);
     gameServer = context.getBean("GameServer", GameServer.class);
-    
+
+    CountDownLatch latch = new CountDownLatch(5);
+    StartCountdown(latch);
+    RunDefaultCommand(latch);
+    ParseScannerIn();
   }
 
-  public static void main(String[] args) {
-    LogHelper.WriteInfoLog("Please type command [start, stop] or auto-start in 5 secs:");
-    ParseCommand();
-    DefaultCommand();
-    StartCountdown();
-  }
-
-  private static void ParseCommand() {
+  private static void ParseScannerIn() {
     Runnable task = new Runnable() {
       @Override
       public void run() {
@@ -54,7 +111,7 @@ public class App {
     ex.execute(task);
   }
 
-  private static void DefaultCommand() {
+  private static void RunDefaultCommand(CountDownLatch latch) {
     Runnable task = new Runnable() {
       @Override
       public void run() {
@@ -67,14 +124,13 @@ public class App {
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
-        String cmd = "start";
-        App.runCommand(cmd);
+        App.runCommand(App.cmd);
       }
     };
     ex.execute(task);
   }
 
-  private static void StartCountdown() {
+  private static void StartCountdown(CountDownLatch latch) {
     Runnable task = new Runnable() {
       @Override
       public void run() {
@@ -92,7 +148,6 @@ public class App {
     };
     ex.execute(task);
   }
-  
 
   private static void runCommand(String cmd) {
     LogHelper.WriteDebugLog("exec: " + cmd);
@@ -108,6 +163,7 @@ public class App {
         ShutdownServer();
         break;
       default:
+        LogHelper.WriteErrorLog("bad cmd");
         break;
       }
   }
@@ -122,7 +178,8 @@ public class App {
     gameServer.StartServer();
     gameServer.StartTimer();
     gameServer.isRunning = true;
-    
+
+    LogHelper.WriteInfoLog(String.format("Command Line env=[%s] cmd=[%s]", App.env, App.cmd));
     LogHelper.WriteInfoLog(String.format("start [%s]", gameServer.isRunning));
   }
 
@@ -132,11 +189,11 @@ public class App {
         LogHelper.WriteDebugLog("server has stopped");
         return;
       }
-      
+
       gameServer.ShutdownServer();
       gameServer.isRunning = false;
       LogHelper.WriteInfoLog(String.format("exit [%s]", !gameServer.isRunning));
-      
+
     } finally {
       ex.shutdown();
       try {

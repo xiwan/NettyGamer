@@ -14,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alibaba.fastjson.JSON;
-import com.xiwan.NettyGamer.CustomThreadFactory;
 import com.xiwan.NettyGamer.entity.LogData;
 
 
@@ -52,11 +51,15 @@ public class LogHelper {
   }
 
   public static void WriteDebugLog(String log) {
-    CommonLogEnqueue(debugQueue, log);
+    StringBuilder sb = new StringBuilder();
+    sb.append(DateTimeHelper.convertDateTime(new Date())).append("|").append(log);
+    CommonLogEnqueue(debugQueue, sb.toString());
   }
   
   public static void WriteErrorLog(String log) {
-    CommonLogEnqueue(errorQueue, log);
+    StringBuilder sb = new StringBuilder();
+    sb.append(DateTimeHelper.convertDateTime(new Date())).append("|").append(log);
+    CommonLogEnqueue(errorQueue, sb.toString());
   }
   
   public static void FlushLog() throws InterruptedException {
