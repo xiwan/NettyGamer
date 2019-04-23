@@ -69,14 +69,17 @@ public class App {
     App.cmd = ServerCmd.getCmd(cmd).name().toLowerCase();
 
   }
-  
+
   private static void InitLogConfig() throws FileNotFoundException {
     String separator = System.getProperty("file.separator");
-    String logConfigRelative = String.format("src%smain%sresources%s", separator, separator, separator);
-    String logConfigFileName = String.format("log4j2.%s.xml", App.env); 
-    String relativePath = logConfigRelative + logConfigFileName;
-
-    File log4jFile = new File(System.getProperty("user.dir") + separator + relativePath);
+    String logConfigRelative = String.format("src%smain%sresources", separator, separator);
+    if (!App.env.equalsIgnoreCase(ServerEnv.DEV.name())) {
+      logConfigRelative = "config";
+    }
+    String logConfigFileName = String.format("log4j2.%s.xml", App.env);
+    String logConfigAbusolutePath = System.getProperty("user.dir") + separator + logConfigRelative + separator + logConfigFileName;
+    System.out.println(logConfigAbusolutePath);
+    File log4jFile = new File(logConfigAbusolutePath);
     if (log4jFile.exists()) {
       ConfigurationSource source = new ConfigurationSource(new FileInputStream(log4jFile), log4jFile);
       Configurator.initialize(null, source);
@@ -157,7 +160,7 @@ public class App {
         StartServer();
         break;
       case STOP:
-        ShutdownServer();
+        StopServer();
         break;
       case SHUTDOWN:
         ShutdownServer();
@@ -182,28 +185,27 @@ public class App {
     LogHelper.WriteInfoLog(String.format("Command Line env=[%s] cmd=[%s]", App.env, App.cmd));
     LogHelper.WriteInfoLog(String.format("start [%s]", gameServer.isRunning));
   }
+  
+  private static void StopServer() {
+    if (!gameServer.isRunning) {
+      LogHelper.WriteDebugLog("server has stopped");
+      return;
+    }
+    gameServer.ShutdownServer();
+    gameServer.isRunning = false;
+    LogHelper.WriteInfoLog(String.format("exit [%s]", !gameServer.isRunning));
+    try {
+      LogHelper.FlushLog();
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
   private static void ShutdownServer() {
-    try {
-      if (!gameServer.isRunning) {
-        LogHelper.WriteDebugLog("server has stopped");
-        return;
-      }
-
-      gameServer.ShutdownServer();
-      gameServer.isRunning = false;
-      LogHelper.WriteInfoLog(String.format("exit [%s]", !gameServer.isRunning));
-
-    } finally {
-      ex.shutdown();
-      try {
-        LogHelper.FlushLog();
-      } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      System.exit(0);
-    }
+    StopServer();
+    ex.shutdown();
+    System.exit(0);
   }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.xiwan.NettyGamer.Enum.ActorMode;
 import com.xiwan.NettyGamer.Enum.ServerResult;
 import com.xiwan.NettyGamer.Job.ActorQueueJob;
+import com.xiwan.NettyGamer.Job.CronJob;
 import com.xiwan.NettyGamer.Job.LogJob;
 import com.xiwan.NettyGamer.Job.RequestQueueJob;
 import com.xiwan.NettyGamer.cache.Actor;
@@ -62,9 +63,11 @@ public class GameServer extends ServerBase {
 
   @Override
   public void StartTimer() {
-    requestQueueJob.run();
-    actorQueueJob.run();
-    logJob.run();
+    requestQueueJob.register((rd)->requestQueueJob.job());
+    actorQueueJob.register((rd)->actorQueueJob.job());
+    logJob.register((rd)->logJob.job());
+    
+    CronJob.startAll();
   }
 
   @Override
