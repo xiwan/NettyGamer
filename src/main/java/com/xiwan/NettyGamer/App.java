@@ -25,8 +25,17 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.xiwan.NettyGamer.Enum.ServerCmd;
 import com.xiwan.NettyGamer.Enum.ServerEnv;
 import com.xiwan.NettyGamer.base.GameServer;
+import com.xiwan.NettyGamer.entity.RequestData;
 import com.xiwan.NettyGamer.utils.CustomThreadFactory;
 import com.xiwan.NettyGamer.utils.LogHelper;
+import com.xw.NettyGamer.core.NettyServer;
+import com.xw.NettyGamer.core.NettyServerHandler;
+import com.xw.NettyGamer.core.consumer.EventConsumer;
+import com.xw.NettyGamer.core.consumer.RequestConsumer;
+import com.xw.NettyGamer.core.protocol.RequestProtocol;
+import com.xw.NettyGamer.core.protocol.ResponseProtocol;
+
+import io.netty.channel.ChannelHandlerContext;
 
 public class App {
   static ExecutorService ex;
@@ -39,9 +48,19 @@ public class App {
   }
 
   public static void main(String[] args) throws ParseException, FileNotFoundException {
-    ParseCommandLine(args);
-    InitLogConfig();
-    InitGamerServer();
+
+    NettyServer server = new NettyServer(8080, 4096, 120, 120, 120);
+
+    server.RegisterHandler(NettyServerHandler.class)
+        .RegisterProtocol(RequestProtocol.class, ResponseProtocol.class)
+        .RegisterConsumer(new RequestConsumer((rd) -> server.ReceiveAction(rd)))
+        .RegisterConsumer(new EventConsumer((ctx) -> server.DisconnectAction(ctx)));
+
+    ex.execute(server);
+    
+//    ParseCommandLine(args);
+//    InitLogConfig();
+//    InitGamerServer();
   }
 
   private static void ParseCommandLine(String[] args) throws ParseException {
@@ -77,7 +96,8 @@ public class App {
       logConfigRelative = "config";
     }
     String logConfigFileName = String.format("log4j2.%s.xml", App.env);
-    String logConfigAbusolutePath = System.getProperty("user.dir") + separator + logConfigRelative + separator + logConfigFileName;
+    String logConfigAbusolutePath = System.getProperty("user.dir") + separator + logConfigRelative + separator
+        + logConfigFileName;
 
     File log4jFile = new File(logConfigAbusolutePath);
     if (log4jFile.exists()) {
@@ -176,7 +196,7 @@ public class App {
     gameServer.Initialize("");
     gameServer.StartServer();
   }
-  
+
   private static void StopServer() {
     gameServer.ShutdownServer();
   }
